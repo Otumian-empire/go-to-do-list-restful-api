@@ -1,36 +1,117 @@
 # Todo List Restful Api Using Golang
 
-1. **API Endpoints:** Define the endpoints for creating, reading, updating, and deleting tasks. These could be:
+## Request
 
-   - `POST /tasks` to create a new task
-   - `GET /tasks` to retrieve a list of all tasks
-   - `GET /tasks/{taskID}` to retrieve a specific task
-   - `PUT /tasks/{taskID}` to update a specific task
-   - `DELETE /tasks/{taskID}` to delete a specific task
+Request will be accepted in `json` format, pass `Content-Type` as `application/json`.
 
-2. **Data Model:** A task might has attributes like `id`, `title`, `description`, `completed`, `createdAt` and `updatedAt`.
+## Response
 
-3. **Database:** Choose a database to store tasks. Use a relational database like PostgreSQL database. Design the schema or document structure accordingly.
+### Message Response
 
-4. **API Server:** Create a Golang server using a framework like "gin" to handle the HTTP requests and interact with the database.
+Message response return a object of `success` and `message` of types, `bool` and `string` respectively
 
-5. **API Logic:** Implement the logic for each endpoint. For example, when a POST request is made to `/tasks`, parse the incoming JSON data and insert a new task into the database.
+#### MessageResponse
 
-6. **Validation:** Implement input validation and error handling. Ensure that the data sent by the client is properly validated before processing it.
+```json
+{
+  "success": true,
+  "message": "some action occurred successful"
+}
+```
 
-7. **Authentication and Authorization:** There won't be any users for now, however for an update consider adding a user.
+### Data Response
 
-8. **Error Handling:** Define a consistent way to handle errors and provide meaningful error responses to clients.
+Data response returns an object of `success`, `message` and `data` of types, `bool`, `string` and a `map[string]any` respectively. This is will returned when fetching data and the action was successful. For cases where we have to read a list of data, pagination property will be added as part of the `data`.
 
-9. **Testing:** Write unit tests and integration tests to ensure the API behaves as expected.
+#### Single row
 
-10. **Documentation:** Create clear and concise documentation for the API endpoints, including how to use them, what data to send, and what to expect in responses.
+**DataResponse**
 
-11. **Deployment:** Use "render" and make use of the auto deploy and free PostgreSQL database, to deploy the API.
+```json
+{
+   "success": true,
+   "message": "some resource was read successful",
+   "data" {
+      "id":1,
+      "username":"john123",
+      ...
+   }
+}
+```
 
-12. **Monitoring and Logging:** Implement logging to track errors and events within the application to keep an eye on the API's performance.
+#### Multiple rows
 
-## Summary
+**PaginatedDataResponse**
+
+```json
+{
+  "success": true,
+  "message": "some resource was read successful",
+  "data" {
+      "rows": [
+         {
+            "id":1,
+            "username":"row1",
+            ...
+         },
+         {
+            "id":2,
+            "username":"row2",
+            ...
+         },
+      ],
+      "pagination": {
+         "pageNumber": 1,
+         "pageSize": 10,
+         "count": 43
+      }
+  }
+}
+```
+
+## Entities
+
+### User
+
+#### Field table
+
+| Field     | Type     | Properties              | Description                                                                       |
+| --------- | -------- | ----------------------- | --------------------------------------------------------------------------------- |
+| id        | `int`    | NOT NULL, AUTOINCREMENT | user id that uniquely identifies user                                             |
+| username  | `string` | NOT NULL, UNIQUE        | username is required                                                              |
+| password  | `string` | NOT NULL                | hashed password before insert                                                     |
+| createdAt | `Date`   |                         | At creation, is the the current timestamp                                         |
+| updatedAt | `Date`   |                         | At creation, is the the current timestamp and on update, is the current timestamp |
+
+#### Behaviour table
+
+| Action         | Argument             | Return                              | Description                                       |
+| -------------- | -------------------- | ----------------------------------- | ------------------------------------------------- |
+| SignUp         | `username, password` | `MessageResponse`                   | Create a user                                     |
+| Login          | `username, password` | `MessageResponse` \| `DataResponse` | Authenticate and authorize user                   |
+| UpdateUsername | `username`           | `MessageResponse`                   | Update a user's username, authentication required |
+| UpdatePassword | `password`           | `MessageResponse`                   | Update a user's password, authentication required |
+| ReadUser       |                      | `DataResponse`                      | Read user details, authentication required        |
+| DeleteUser     |                      | `DataResponse`                      | Delete user details, authentication required      |
+
+#### Validation
+
+- id: int, database generated
+- username: string, minimum of 5, maximum of 10
+- password: string, minimum of 5, maximum of 10
+
+#### API Endpoints
+
+| Action         | Method   | Endpoint          | Description                     |
+| -------------- | -------- | ----------------- | ------------------------------- |
+| SignUp         | `POST`   | `/users`          | to create a new user            |
+| Login          | `POST`   | `/users/auth`     | to login a user                 |
+| UpdateUsername | `PUT`    | `/users/username` | to update username              |
+| UpdatePassword | `PUT`    | `/users/password` | to update password              |
+| ReadUser       | `GET`    | `/users`          | to create a new task            |
+| DeleteUser     | `DELETE` | `/users`          | to retrieve a list of all tasks |
+
+## Tool/Dependencies
 
 - Gin for https server and routing
 - PostgreSQL for database
