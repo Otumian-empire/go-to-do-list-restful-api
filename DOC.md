@@ -121,7 +121,7 @@ Table name = "users"
 | Action         | Auth    | Method   | Endpoint          | Description                          |
 | -------------- | ------- | -------- | ----------------- | ------------------------------------ |
 | SignUp         | `false` | `POST`   | `/users`          | to create a new user                 |
-| Login          | `true`  | `POST`   | `/users/auth`     | to login a user                      |
+| Login          | `false` | `POST`   | `/users/auth`     | to login a user                      |
 | UpdateUsername | `true`  | `PUT`    | `/users/username` | to update username                   |
 | UpdatePassword | `true`  | `PUT`    | `/users/password` | to update password                   |
 | ReadUser       | `true`  | `GET`    | `/users`          | to create a new task                 |
