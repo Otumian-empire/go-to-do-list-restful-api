@@ -172,6 +172,10 @@ Table name = "todos"
 | UpdateCompleted | `true`  | `GET`    | `/todos/:id/state`               | to update the completion state |
 | DeleteTodo      | `true`  | `DELETE` | `/todos/:id`                     | to delete a todo               |
 
+### Entity Relationship
+
+A user may zero or more todos
+
 ## Authentication
 
 - `GetAuthenticatedToken(userId, username string) string`: get authentication token that last for 30 minutes using username nad password by creating a new user or logging in
