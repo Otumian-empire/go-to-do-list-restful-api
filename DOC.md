@@ -1,5 +1,14 @@
 # Todo List Restful Api Using Golang
 
+Documentation on application design
+
+## Tool/Dependencies
+
+- Gin for https server and routing
+- PostgreSQL for database
+- Render as hosting server
+- Github to deploy code to Render
+
 ## Request
 
 Request will be accepted in `json` format, pass `Content-Type` as `application/json`.
@@ -15,7 +24,7 @@ Message response return a object of `success` and `message` of types, `bool` and
 ```json
 {
   "success": true,
-  "message": "some action occurred successful"
+  "message": "some action occurred successfully"
 }
 ```
 
@@ -30,7 +39,7 @@ Data response returns an object of `success`, `message` and `data` of types, `bo
 ```json
 {
    "success": true,
-   "message": "some resource was read successful",
+   "message": "some resource was read successfully",
    "data" {
       "id":1,
       "username":"john123",
@@ -99,6 +108,7 @@ Table name = "users"
 | UpdatePassword | `password`           | `MessageResponse`                   | Update a user's password             |
 | ReadUser       |                      | `DataResponse`                      | Read this authenticated user details |
 | DeleteUser     |                      | `MessageResponse`                   | Delete user details                  |
+| Logout         |                      | `MessageResponse`                   | Logout user                          |
 
 #### Validation
 
@@ -108,14 +118,15 @@ Table name = "users"
 
 #### API Endpoints
 
-| Action         | Auth    | Method   | Endpoint          | Description                     |
-| -------------- | ------- | -------- | ----------------- | ------------------------------- |
-| SignUp         | `false` | `POST`   | `/users`          | to create a new user            |
-| Login          | `true`  | `POST`   | `/users/auth`     | to login a user                 |
-| UpdateUsername | `true`  | `PUT`    | `/users/username` | to update username              |
-| UpdatePassword | `true`  | `PUT`    | `/users/password` | to update password              |
-| ReadUser       | `true`  | `GET`    | `/users`          | to create a new task            |
-| DeleteUser     | `true`  | `DELETE` | `/users`          | to retrieve a list of all tasks |
+| Action         | Auth    | Method   | Endpoint          | Description                          |
+| -------------- | ------- | -------- | ----------------- | ------------------------------------ |
+| SignUp         | `false` | `POST`   | `/users`          | to create a new user                 |
+| Login          | `true`  | `POST`   | `/users/auth`     | to login a user                      |
+| UpdateUsername | `true`  | `PUT`    | `/users/username` | to update username                   |
+| UpdatePassword | `true`  | `PUT`    | `/users/password` | to update password                   |
+| ReadUser       | `true`  | `GET`    | `/users`          | to create a new task                 |
+| DeleteUser     | `true`  | `DELETE` | `/users`          | to delete a user and all their todos |
+| Logout         | `true`  | `GET`    | `/users/auth`     | to logout a user                     |
 
 ### Todo
 
@@ -152,18 +163,20 @@ Table name = "todos"
 
 #### API Endpoints
 
-| Action          | Auth    | Method   | Endpoint          | Description                     |
-| --------------- | ------- | -------- | ----------------- | ------------------------------- |
-| CreateTodo      | `false` | `POST`   | `/users`          | to create a new user            |
-| ReadTodo        | `true`  | `POST`   | `/users/auth`     | to login a user                 |
-| ReadTodos       | `true`  | `PUT`    | `/users/username` | to update username              |
-| UpdateTask      | `true`  | `PUT`    | `/users/password` | to update password              |
-| UpdateCompleted | `true`  | `GET`    | `/users`          | to create a new task            |
-| DeleteTodo      | `true`  | `DELETE` | `/users`          | to retrieve a list of all tasks |
+| Action          | Auth    | Method   | Endpoint                         | Description                    |
+| --------------- | ------- | -------- | -------------------------------- | ------------------------------ |
+| CreateTodo      | `false` | `POST`   | `/todos`                         | to create a new todo           |
+| ReadTodo        | `true`  | `GET`    | `/todos/:id`                     | to read a todo                 |
+| ReadTodos       | `true`  | `GET`    | `/todos?pageNumber=1&pageSize=4` | to read todos                  |
+| UpdateTask      | `true`  | `PUT`    | `/todos/:id`                     | to update task                 |
+| UpdateCompleted | `true`  | `GET`    | `/todos/:id/state`               | to update the completion state |
+| DeleteTodo      | `true`  | `DELETE` | `/todos/:id`                     | to delete a todo               |
 
-## Tool/Dependencies
+## Authentication
 
-- Gin for https server and routing
-- PostgreSQL for database
-- Render as hosting server
-- Github to deploy code to Render
+- `GetAuthenticatedToken(userId, username string) string`: get authentication token that last for 30 minutes using username nad password by creating a new user or logging in
+
+## Middleware
+
+- `IsAuthenticated(authToken: string) bool`: pass the authenticated token to get authorization to access resources
+- set the authenticated user to request.user
