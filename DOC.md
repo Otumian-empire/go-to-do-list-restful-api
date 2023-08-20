@@ -100,15 +100,15 @@ Table name = "users"
 
 #### Behaviour table
 
-| Action         | Argument             | Return                              | Description                          |
-| -------------- | -------------------- | ----------------------------------- | ------------------------------------ |
-| SignUp         | `username, password` | `MessageResponse`                   | Create a user                        |
-| Login          | `username, password` | `MessageResponse` \| `DataResponse` | Authenticate and authorize user      |
-| UpdateUsername | `username`           | `MessageResponse`                   | Update a user's username             |
-| UpdatePassword | `password`           | `MessageResponse`                   | Update a user's password             |
-| ReadUser       |                      | `DataResponse`                      | Read this authenticated user details |
-| DeleteUser     |                      | `MessageResponse`                   | Delete user details                  |
-| Logout         |                      | `MessageResponse`                   | Logout user                          |
+| Action             | Argument             | Return                              | Description                          |
+| ------------------ | -------------------- | ----------------------------------- | ------------------------------------ |
+| SignUp             | `username, password` | `MessageResponse`                   | Create a user                        |
+| Login              | `username, password` | `MessageResponse` \| `DataResponse` | Authenticate and authorize user      |
+| UpdateUserUsername | `username`           | `MessageResponse`                   | Update a user's username             |
+| UpdateUserPassword | `password`           | `MessageResponse`                   | Update a user's password             |
+| ReadUser           |                      | `DataResponse`                      | Read this authenticated user details |
+| DeleteUser         |                      | `MessageResponse`                   | Delete user details                  |
+| Logout             |                      | `MessageResponse`                   | Logout user                          |
 
 #### Validation
 
@@ -118,15 +118,15 @@ Table name = "users"
 
 #### API Endpoints
 
-| Action         | Auth    | Method   | Endpoint          | Description                          |
-| -------------- | ------- | -------- | ----------------- | ------------------------------------ |
-| SignUp         | `false` | `POST`   | `/users`          | to create a new user                 |
-| Login          | `false` | `POST`   | `/users/auth`     | to login a user                      |
-| UpdateUsername | `true`  | `PUT`    | `/users/username` | to update username                   |
-| UpdatePassword | `true`  | `PUT`    | `/users/password` | to update password                   |
-| ReadUser       | `true`  | `GET`    | `/users`          | to create a new task                 |
-| DeleteUser     | `true`  | `DELETE` | `/users`          | to delete a user and all their todos |
-| Logout         | `true`  | `GET`    | `/users/auth`     | to logout a user                     |
+| Action             | Auth    | Method   | Endpoint          | Description                          |
+| ------------------ | ------- | -------- | ----------------- | ------------------------------------ |
+| SignUp             | `false` | `POST`   | `/users`          | to create a new user                 |
+| Login              | `false` | `POST`   | `/users/auth`     | to login a user                      |
+| UpdateUserUsername | `true`  | `PUT`    | `/users/username` | to update username                   |
+| UpdateUserPassword | `true`  | `PUT`    | `/users/password` | to update password                   |
+| ReadUser           | `true`  | `GET`    | `/users`          | to create a new task                 |
+| DeleteUser         | `true`  | `DELETE` | `/users`          | to delete a user and all their todos |
+| Logout             | `true`  | `GET`    | `/users/auth`     | to logout a user                     |
 
 ### Todo
 
@@ -144,14 +144,14 @@ Table name = "todos"
 
 #### Behaviour table
 
-| Action          | Argument                   | Return                  | Description                          |
-| --------------- | -------------------------- | ----------------------- | ------------------------------------ |
-| CreateTodo      | `task`                     | `MessageResponse`       | Create a todo                        |
-| ReadTodo        | `id`                       | `DataResponse`          | Read a user's todo by id             |
-| ReadTodos       | `?pageNumber`, `?pageSize` | `PaginatedDataResponse` | Read a section of a user's todos     |
-| UpdateTask      | `id`, `task`               | `MessageResponse`       | Update a user's todo task by id      |
-| UpdateCompleted | `id`, `completed`          | `MessageResponse`       | Update a user's todo completed state |
-| DeleteTodo      | `id`                       | `MessageResponse`       | Delete a user's todo by id           |
+| Action              | Argument                   | Return                  | Description                          |
+| ------------------- | -------------------------- | ----------------------- | ------------------------------------ |
+| CreateTodo          | `task`                     | `MessageResponse`       | Create a todo                        |
+| ReadTodo            | `id`                       | `DataResponse`          | Read a user's todo by id             |
+| ReadTodos           | `?pageNumber`, `?pageSize` | `PaginatedDataResponse` | Read a section of a user's todos     |
+| UpdateTodoTask      | `id`, `task`               | `MessageResponse`       | Update a user's todo task by id      |
+| UpdateTodoCompleted | `id`, `completed`          | `MessageResponse`       | Update a user's todo completed state |
+| DeleteTodo          | `id`                       | `MessageResponse`       | Delete a user's todo by id           |
 
 #### Validation
 
@@ -163,14 +163,14 @@ Table name = "todos"
 
 #### API Endpoints
 
-| Action          | Auth    | Method   | Endpoint                         | Description                    |
-| --------------- | ------- | -------- | -------------------------------- | ------------------------------ |
-| CreateTodo      | `false` | `POST`   | `/todos`                         | to create a new todo           |
-| ReadTodo        | `true`  | `GET`    | `/todos/:id`                     | to read a todo                 |
-| ReadTodos       | `true`  | `GET`    | `/todos?pageNumber=1&pageSize=4` | to read todos                  |
-| UpdateTask      | `true`  | `PUT`    | `/todos/:id`                     | to update task                 |
-| UpdateCompleted | `true`  | `GET`    | `/todos/:id/state`               | to update the completion state |
-| DeleteTodo      | `true`  | `DELETE` | `/todos/:id`                     | to delete a todo               |
+| Action              | Auth    | Method   | Endpoint                         | Description                    |
+| ------------------- | ------- | -------- | -------------------------------- | ------------------------------ |
+| CreateTodo          | `false` | `POST`   | `/todos`                         | to create a new todo           |
+| ReadTodo            | `true`  | `GET`    | `/todos/:id`                     | to read a todo                 |
+| ReadTodos           | `true`  | `GET`    | `/todos?pageNumber=1&pageSize=4` | to read todos                  |
+| UpdateTodoTask      | `true`  | `PUT`    | `/todos/:id`                     | to update task                 |
+| UpdateTodoCompleted | `true`  | `GET`    | `/todos/:id/state`               | to update the completion state |
+| DeleteTodo          | `true`  | `DELETE` | `/todos/:id`                     | to delete a todo               |
 
 ### Entity Relationship
 
