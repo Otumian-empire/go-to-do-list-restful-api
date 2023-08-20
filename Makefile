@@ -1,7 +1,7 @@
 .PHONY: app tidy lampp klampp
 
 app:
-	@clear && go run src/cmd/main.go
+	@clear && go run cmd/main.go
 
 tidy:
 	@clear && go mod tidy
