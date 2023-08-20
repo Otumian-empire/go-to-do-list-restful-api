@@ -5,7 +5,7 @@ Documentation on application design
 ## Tool/Dependencies
 
 - Gin for https server and routing
-- PostgreSQL for database
+- MySQL for database
 - Render as hosting server
 - Github to deploy code to Render
 
@@ -184,3 +184,8 @@ A user may zero or more todos
 
 - `IsAuthenticated(authToken: string) bool`: pass the authenticated token to get authorization to access resources
 - set the authenticated user to request.user
+
+## Modification
+
+- It is not always that the `id` will be an `int` and for that, _config/type_ we define, `IdType` type. Update the type to the required
+- Since the database drive may, you can then implement your own _repository_ that reflects the interfaces in _model_ folder
