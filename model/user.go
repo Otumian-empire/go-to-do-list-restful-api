@@ -12,9 +12,9 @@ type User struct {
 
 type UserModel interface {
 	CreateUser(username, password string) error
-	GetById(id config.IdType) (User, error)
-	GetByUsername(username string) (User, error)
-	UpdatePassword(id config.IdType, password string) error
-	UpdateUsername(id config.IdType, username string) error
+	ReadUserById(id config.IdType) (User, error)
+	ReadUserByUsername(username string) (User, error)
+	UpdateUserPassword(id config.IdType, password string) error
+	UpdateUserUsername(id config.IdType, username string) error
 	DeleteUser(id config.IdType) error
 }
