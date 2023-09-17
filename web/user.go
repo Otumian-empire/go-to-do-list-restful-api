@@ -4,11 +4,11 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/otumian-empire/go-to-do-list-restful-api/model"
+	"github.com/otumian-empire/go-to-do-list-restful-api/repository"
 )
 
 type UserController struct {
-	model model.UserModel
+	model repository.Repository
 }
 
 func (controller *UserController) SignUp() gin.HandlerFunc {
@@ -22,10 +22,19 @@ func (controller *UserController) SignUp() gin.HandlerFunc {
 			return
 		}
 
-		// TODO: install bcrypt and create a hash of the password
+		passwordHash, err := HashPassword(payload.Password)
+
+		if err != nil {
+			log.Println(err)
+			context.JSON(FailureMessageResponse(err.Error()))
+			return
+		}
+
+		payload.Password = passwordHash
 
 		// create user
-		if err := controller.model.CreateUser(payload.Username, payload.Password); err != nil {
+		if err := controller.model.User.CreateUser(payload.Username, payload.Password); err != nil {
+			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(err.Error()))
 			return
 		}

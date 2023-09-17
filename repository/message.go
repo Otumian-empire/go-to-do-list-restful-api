@@ -15,7 +15,7 @@ const (
 
 // User defined error messages for the user model
 const (
-	CREATE_USER_ERROR = "could not create user"
+	CREATE_USER_ERROR = "could not create user, check your credentials and try again"
 	DELETE_USER_ERROR = "could not delete user"
 	UPDATE_USER_ERROR = "could not update user"
 )
