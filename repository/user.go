@@ -61,11 +61,11 @@ func (user *User) ReadUserByUsername(username string) (model.User, error) {
 
 	var _user model.User
 	err := row.Scan(
-		// &_user.Id,
+		&_user.Id,
 		&_user.Username,
 		&_user.Password,
-		// &_user.CreatedAt,
-		// &_user.UpdatedAt
+		&_user.CreatedAt,
+		&_user.UpdatedAt,
 	)
 
 	if err != nil {

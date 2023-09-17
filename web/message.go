@@ -4,6 +4,8 @@ const (
 	SIGN_UP_SUCCESSFUL = "user created successfully, please login"
 	LOGIN_SUCCESSFUL   = "login successfully"
 
+	INVALID_CREDENTIAL = "Incorrect username or password"
+
 	DATABASE_CONNECTED = "database connected"
 )
 

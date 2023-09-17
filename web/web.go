@@ -15,7 +15,7 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 	userRoutes := router.Group("/users")
 	{
 		userRoutes.POST("/", userController.SignUp())
-		// userRoutes.POST("/auth", userController.Login())
+		userRoutes.POST("/auth", userController.Login())
 		// userRoutes.PUT("/username", userController.UpdateUserUsername())
 		// userRoutes.PUT("/password", userController.UpdateUserPassword())
 		// userRoutes.GET("/", userController.ReadUser())

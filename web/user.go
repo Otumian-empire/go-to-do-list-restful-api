@@ -59,13 +59,19 @@ func (controller *UserController) Login() gin.HandlerFunc {
 		// read row with the same username
 		row, err := controller.model.ReadUserByUsername(payload.Username)
 
+		log.Println(row)
 		if err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(err.Error()))
 			return
 		}
 
-		// TODO: compare the user password passed to the hash
+		if !CheckPasswordHash(payload.Password, row.Password) {
+			log.Println("Validation check failed")
+			context.JSON(FailureMessageResponse(INVALID_CREDENTIAL))
+			return
+		}
+
 		row.Password = ""
 
 		// return success message on user creation
@@ -74,12 +80,12 @@ func (controller *UserController) Login() gin.HandlerFunc {
 	}
 }
 
-func (controller *UserController) UpdateUserUsername() gin.HandlerFunc
+// func (controller *UserController) UpdateUserUsername() gin.HandlerFunc
 
-func (controller *UserController) UpdateUserPassword() gin.HandlerFunc
+// func (controller *UserController) UpdateUserPassword() gin.HandlerFunc
 
-func (controller *UserController) ReadUser() gin.HandlerFunc
+// func (controller *UserController) ReadUser() gin.HandlerFunc
 
-func (controller *UserController) DeleteUser() gin.HandlerFunc
+// func (controller *UserController) DeleteUser() gin.HandlerFunc
 
-func (controller *UserController) Logout() gin.HandlerFunc
+// func (controller *UserController) Logout() gin.HandlerFunc
