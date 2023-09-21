@@ -9,7 +9,7 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 
 	// call the controllers and pass the repository
 	userController := UserController{model: _repository}
-	// add other controllers here
+	todoController := TodoController{model: _repository}
 
 	// endpoints specific to create, read and delete of the url
 	userRoutes := router.Group("/users")
@@ -26,8 +26,13 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 		// userRoutes.GET("/logout", userController.Logout())
 	}
 
-	// endpoint to redirect to the actual url
-	// router.GET("/:hash", userController.GerOriginalUrl())
+	// endpoints specific for todos
+	todoRoutes := router.Group("/todos")
+	{
+		todoRoutes.Use(ApiKeyAuth(_repository))
+
+		todoRoutes.POST("/", todoController.CreateTodo())
+	}
 
 	return router
 }

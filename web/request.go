@@ -14,3 +14,7 @@ type UpdateUserUsernameRequestBody struct {
 type UpdateUserPasswordRequestBody struct {
 	Password string `json:"password"`
 }
+
+type CreateTodoRequestBody struct {
+	Task string `json:"task"`
+}
