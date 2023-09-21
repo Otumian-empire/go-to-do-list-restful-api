@@ -113,7 +113,7 @@ func (controller *UserController) UpdateUserUsername() gin.HandlerFunc {
 		log.Println(value)
 
 		if !isValue {
-			context.JSON(SuccessMessageResponse(INVALID_AUTHENTICATION))
+			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
@@ -163,7 +163,7 @@ func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
 		log.Println(value)
 
 		if !isValue {
-			context.JSON(SuccessMessageResponse(INVALID_AUTHENTICATION))
+			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
@@ -189,7 +189,7 @@ func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
 
 		if passwordHashingError != nil {
 			log.Println(passwordHashingError)
-			context.JSON(SuccessMessageResponse(passwordHashingError.Error()))
+			context.JSON(FailureMessageResponse(passwordHashingError.Error()))
 			return
 		}
 
@@ -212,7 +212,7 @@ func (controller *UserController) ReadUser() gin.HandlerFunc {
 		log.Println(value)
 
 		if !isValue {
-			context.JSON(SuccessMessageResponse(USER_DETAIL_READ_SUCCESSFULLY))
+			context.JSON(FailureMessageResponse(USER_DETAIL_READ_SUCCESSFULLY))
 			return
 		}
 
@@ -227,19 +227,19 @@ func (controller *UserController) DeleteUser() gin.HandlerFunc {
 		log.Println(value)
 
 		if !isValue {
-			context.JSON(SuccessMessageResponse(INVALID_AUTHENTICATION))
+			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
 		if err := controller.model.DeleteTodos(value.Id); err != nil {
 			log.Println(err)
-			context.JSON(SuccessMessageResponse(COULD_NOT_DELETE_USER))
+			context.JSON(FailureMessageResponse(COULD_NOT_DELETE_USER))
 			return
 		}
 
 		if err := controller.model.DeleteUser(value.Id); err != nil {
 			log.Println(err)
-			context.JSON(SuccessMessageResponse(COULD_NOT_DELETE_USER))
+			context.JSON(FailureMessageResponse(COULD_NOT_DELETE_USER))
 			return
 		}
 
