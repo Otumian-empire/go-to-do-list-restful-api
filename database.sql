@@ -11,10 +11,11 @@ CREATE TABLE `user`(
 
 -- Create todo table
 CREATE TABLE `todo` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `task` varchar(255) NOT NULL,
   `completed` tinyint(1) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `user` int(11) NOT NULL
+  `user` int(11) NOT NULL,
+  PRIMARY KEY(`id`),
 )
