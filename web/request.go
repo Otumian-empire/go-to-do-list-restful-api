@@ -10,3 +10,7 @@ type AuthRequestBody struct {
 type UpdateUserUsernameRequestBody struct {
 	Username string `json:"username"`
 }
+
+type UpdateUserPasswordRequestBody struct {
+	Password string `json:"password"`
+}

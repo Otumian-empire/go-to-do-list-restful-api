@@ -156,7 +156,54 @@ func (controller *UserController) UpdateUserUsername() gin.HandlerFunc {
 	}
 }
 
-// func (controller *UserController) UpdateUserPassword() gin.HandlerFunc
+func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		value, isValue := context.MustGet("user").(model.User)
+
+		log.Println(value)
+
+		if !isValue {
+			context.JSON(SuccessMessageResponse(INVALID_AUTHENTICATION))
+			return
+		}
+
+		// get the password from the request body
+		var payload UpdateUserPasswordRequestBody
+
+		// check if the user is valid
+		if err := context.BindJSON(&payload); err != nil {
+			log.Println(err.Error())
+			context.JSON(FailureMessageResponse(err.Error()))
+			return
+		}
+
+		payload.Password = strings.Trim(payload.Password, " ")
+
+		if len(payload.Password) < 1 {
+			log.Println(INVALID_PASSWORD)
+			context.JSON(FailureMessageResponse(INVALID_PASSWORD))
+			return
+		}
+
+		passwordHash, passwordHashingError := HashPassword(payload.Password)
+
+		if passwordHashingError != nil {
+			log.Println(passwordHashingError)
+			context.JSON(SuccessMessageResponse(passwordHashingError.Error()))
+			return
+		}
+
+		// update the password
+		if err := controller.model.UpdateUserPassword(value.Id, passwordHash); err != nil {
+			log.Println(err.Error())
+			context.JSON(FailureMessageResponse(COULD_NOT_UPDATE_PASSWORD))
+			return
+		}
+
+		// return a success response
+		context.JSON(SuccessMessageResponse(PASSWORD_UPDATED_SUCCESSFULLY))
+	}
+}
 
 // func (controller *UserController) ReadUser() gin.HandlerFunc
 

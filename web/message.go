@@ -4,11 +4,14 @@ const (
 	SIGN_UP_SUCCESSFUL            = "user created successfully, please login"
 	LOGIN_SUCCESSFUL              = "login successfully"
 	USERNAME_UPDATED_SUCCESSFULLY = "username updated successfully"
+	PASSWORD_UPDATED_SUCCESSFULLY = "password updated successfully"
 
 	INVALID_CREDENTIAL        = "Incorrect username or password"
 	INVALID_USERNAME          = "Invalid username"
+	INVALID_PASSWORD          = "Invalid password"
 	USERNAME_TAKEN            = "Username is taken, try another one"
 	COULD_NOT_UPDATE_USERNAME = "could not update username"
+	COULD_NOT_UPDATE_PASSWORD = "could not update password"
 
 	DATABASE_CONNECTED = "database connected"
 )
