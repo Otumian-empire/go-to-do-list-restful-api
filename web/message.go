@@ -1,12 +1,20 @@
 package web
 
 const (
-	SIGN_UP_SUCCESSFUL = "user created successfully, please login"
-	LOGIN_SUCCESSFUL   = "login successfully"
+	SIGN_UP_SUCCESSFUL            = "user created successfully, please login"
+	LOGIN_SUCCESSFUL              = "login successfully"
+	USERNAME_UPDATED_SUCCESSFULLY = "username updated successfully"
 
-	INVALID_CREDENTIAL = "Incorrect username or password"
+	INVALID_CREDENTIAL        = "Incorrect username or password"
+	INVALID_USERNAME          = "Invalid username"
+	USERNAME_TAKEN            = "Username is taken, try another one"
+	COULD_NOT_UPDATE_USERNAME = "could not update username"
 
 	DATABASE_CONNECTED = "database connected"
+)
+
+const (
+	INVALID_AUTHENTICATION = "invalid authentication"
 )
 
 const (

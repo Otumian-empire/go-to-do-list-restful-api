@@ -16,7 +16,10 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 	{
 		userRoutes.POST("/", userController.SignUp())
 		userRoutes.POST("/auth", userController.Login())
-		// userRoutes.PUT("/username", userController.UpdateUserUsername())
+
+		userRoutes.Use(ApiKeyAuth(_repository))
+
+		userRoutes.PUT("/username", userController.UpdateUserUsername())
 		// userRoutes.PUT("/password", userController.UpdateUserPassword())
 		// userRoutes.GET("/", userController.ReadUser())
 		// userRoutes.DELETE("/", userController.DeleteUser())

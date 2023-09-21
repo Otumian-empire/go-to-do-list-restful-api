@@ -45,8 +45,16 @@ func FailureMessageResponse(message string) (int, T) {
 	}).send()
 }
 
-func ErrorResponse(message string) (int, T) {
+func ServerErrorResponse(message string) (int, T) {
 	return new(http.StatusInternalServerError, T{
+		"success": false,
+		"message": message,
+		"data":    nil,
+	}).send()
+}
+
+func AuthenticationErrorResponse(message string) (int, T) {
+	return new(http.StatusUnauthorized, T{
 		"success": false,
 		"message": message,
 		"data":    nil,
