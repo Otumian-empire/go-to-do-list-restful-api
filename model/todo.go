@@ -6,14 +6,14 @@ type Todo struct {
 	Id        config.IdType `db:"id" json:"id"`
 	Task      string        `db:"task" json:"task"`
 	Completed bool          `db:"completed" json:"completed"`
-	User      config.IdType `db:"user" json:"user"`
 	CreatedAt string        `db:"created_at" json:"created_at"`
 	UpdatedAt string        `db:"updated_at" json:"updated_at"`
+	User      config.IdType `db:"user" json:"user"`
 }
 
 type TodoModel interface {
 	CreateTodo(userId config.IdType, task string) error
-	ReadTodoById(userId, id config.IdType) (Todo, error)
+	ReadTodoById(id config.IdType) (Todo, error)
 	PaginateTodo(userId config.IdType, offset, limit int) ([]Todo, error)
 	UpdateTodoTask(userId, id config.IdType, task string) error
 	UpdateTodoCompletedState(userId, id config.IdType, completed bool) error

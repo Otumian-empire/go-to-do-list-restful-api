@@ -45,9 +45,9 @@ func (todo *Todo) ReadTodoById(userId, id config.IdType) (model.Todo, error) {
 		&_todo.Id,
 		&_todo.Task,
 		&_todo.Completed,
-		&_todo.User,
 		&_todo.CreatedAt,
-		&_todo.UpdatedAt)
+		&_todo.UpdatedAt,
+		&_todo.User)
 
 	if err != nil {
 		log.Println(err)
@@ -75,9 +75,9 @@ func (todo *Todo) PaginateTodo(userId config.IdType, offset, limit int) ([]model
 			&_todo.Id,
 			&_todo.Task,
 			&_todo.Completed,
-			&_todo.User,
 			&_todo.CreatedAt,
-			&_todo.UpdatedAt)
+			&_todo.UpdatedAt,
+			&_todo.User)
 
 		if err != nil {
 			log.Println(err)

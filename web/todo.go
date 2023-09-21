@@ -2,14 +2,16 @@ package web
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/otumian-empire/go-to-do-list-restful-api/model"
+	"github.com/otumian-empire/go-to-do-list-restful-api/repository"
 )
 
 type TodoController struct {
-	model model.TodoModel
+	model repository.Repository
 }
 
 func (controller *TodoController) CreateTodo() gin.HandlerFunc {
@@ -49,7 +51,42 @@ func (controller *TodoController) CreateTodo() gin.HandlerFunc {
 	}
 }
 
-// func (controller *TodoController) ReadTodo() gin.HandlerFunc
+func (controller *TodoController) ReadTodo() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		value, isValue := context.MustGet("user").(model.User)
+
+		log.Println(value)
+
+		if !isValue {
+			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
+			return
+		}
+
+		var id = context.Param("id")
+
+		if len(id) < 1 {
+			context.JSON(FailureMessageResponse(INVALID_ID))
+			return
+		}
+
+		intId, intIdErr := strconv.Atoi(id)
+
+		if intIdErr != nil {
+			context.JSON(FailureMessageResponse(INVALID_ID))
+			return
+		}
+
+		todo, todoErr := controller.model.ReadTodoById(value.Id, intId)
+
+		if todoErr != nil {
+			log.Println(todoErr)
+			context.JSON(FailureMessageResponse(todoErr.Error()))
+			return
+		}
+
+		context.JSON(SuccessResponse(TODO_READ_SUCCESSFULLY, todo))
+	}
+}
 
 // func (controller *TodoController) ReadTodos() gin.HandlerFunc
 

@@ -10,12 +10,12 @@ CREATE TABLE `user`(
 );
 
 -- Create todo table
-CREATE TABLE `todo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `task` varchar(255) NOT NULL,
-  `completed` tinyint(1) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `user` int(11) NOT NULL,
-  PRIMARY KEY(`id`),
+CREATE TABLE `todo1`(
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `task` VARCHAR(255) NOT NULL,
+    `completed` TINYINT(1) NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `user` INT(11) NOT NULL,
+    PRIMARY KEY(`id`)
 )

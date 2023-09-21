@@ -32,6 +32,7 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 		todoRoutes.Use(ApiKeyAuth(_repository))
 
 		todoRoutes.POST("/", todoController.CreateTodo())
+		todoRoutes.GET("/:id", todoController.ReadTodo())
 	}
 
 	return router
