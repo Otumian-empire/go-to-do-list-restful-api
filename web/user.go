@@ -205,7 +205,20 @@ func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
 	}
 }
 
-// func (controller *UserController) ReadUser() gin.HandlerFunc
+func (controller *UserController) ReadUser() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		value, isValue := context.MustGet("user").(model.User)
+
+		log.Println(value)
+
+		if !isValue {
+			context.JSON(SuccessMessageResponse(USER_DETAIL_READ_SUCCESSFULLY))
+			return
+		}
+
+		context.JSON(SuccessResponse(USER_DETAIL_READ_SUCCESSFULLY, value))
+	}
+}
 
 // func (controller *UserController) DeleteUser() gin.HandlerFunc
 

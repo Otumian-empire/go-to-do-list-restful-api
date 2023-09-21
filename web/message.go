@@ -5,6 +5,7 @@ const (
 	LOGIN_SUCCESSFUL              = "login successfully"
 	USERNAME_UPDATED_SUCCESSFULLY = "username updated successfully"
 	PASSWORD_UPDATED_SUCCESSFULLY = "password updated successfully"
+	USER_DETAIL_READ_SUCCESSFULLY = "user detail read successfully"
 
 	INVALID_CREDENTIAL        = "Incorrect username or password"
 	INVALID_USERNAME          = "Invalid username"

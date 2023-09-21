@@ -21,7 +21,7 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 
 		userRoutes.PUT("/username", userController.UpdateUserUsername())
 		userRoutes.PUT("/password", userController.UpdateUserPassword())
-		// userRoutes.GET("/", userController.ReadUser())
+		userRoutes.GET("/", userController.ReadUser())
 		// userRoutes.DELETE("/", userController.DeleteUser())
 		// userRoutes.GET("/logout", userController.Logout())
 	}
