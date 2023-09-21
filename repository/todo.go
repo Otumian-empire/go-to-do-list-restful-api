@@ -155,13 +155,15 @@ func (todo *Todo) DeleteTodos(userId config.IdType) error {
 		return fmt.Errorf(DELETE_TODO_ERROR)
 	}
 
-	if rowsAffected, err := result.RowsAffected(); err != nil {
+	if _, err := result.RowsAffected(); err != nil {
 		log.Println(err.Error())
 		return fmt.Errorf(DELETE_TODO_ERROR)
-	} else if rowsAffected < 1 {
-		log.Println(NO_ROW_AFFECT_ERROR)
-		return fmt.Errorf(DELETE_TODO_ERROR)
 	}
+
+	// else if rowsAffected < 1 {
+	// 	log.Println(NO_ROW_AFFECT_ERROR)
+	// 	return fmt.Errorf(DELETE_TODO_ERROR)
+	// }
 
 	return nil
 }

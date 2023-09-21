@@ -220,6 +220,31 @@ func (controller *UserController) ReadUser() gin.HandlerFunc {
 	}
 }
 
-// func (controller *UserController) DeleteUser() gin.HandlerFunc
+func (controller *UserController) DeleteUser() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		value, isValue := context.MustGet("user").(model.User)
+
+		log.Println(value)
+
+		if !isValue {
+			context.JSON(SuccessMessageResponse(INVALID_AUTHENTICATION))
+			return
+		}
+
+		if err := controller.model.DeleteTodos(value.Id); err != nil {
+			log.Println(err)
+			context.JSON(SuccessMessageResponse(COULD_NOT_DELETE_USER))
+			return
+		}
+
+		if err := controller.model.DeleteUser(value.Id); err != nil {
+			log.Println(err)
+			context.JSON(SuccessMessageResponse(COULD_NOT_DELETE_USER))
+			return
+		}
+
+		context.JSON(SuccessMessageResponse(USER_DELETED_SUCCESSFULLY))
+	}
+}
 
 // func (controller *UserController) Logout() gin.HandlerFunc
