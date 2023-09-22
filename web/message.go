@@ -9,6 +9,7 @@ const (
 	TODO_READ_SUCCESSFULLY        = "todo read successfully"
 	TODOS_READ_SUCCESSFULLY       = "todos read successfully"
 	TODO_UPDATED_SUCCESSFULLY     = "todo updated successfully"
+	TODO_DELETED_SUCCESSFULLY     = "todo deleted successfully"
 
 	INVALID_USERNAME   = "invalid username"
 	INVALID_PASSWORD   = "invalid password"

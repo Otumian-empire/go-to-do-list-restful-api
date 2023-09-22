@@ -252,4 +252,39 @@ func (controller *TodoController) UpdateTodoCompleted() gin.HandlerFunc {
 	}
 }
 
-// func (controller *TodoController) DeleteTodo() gin.HandlerFunc
+func (controller *TodoController) DeleteTodo() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		value, isValue := context.MustGet("user").(model.User)
+
+		if !isValue {
+			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
+			return
+		}
+
+		log.Println(value)
+
+		// Get todo id from params
+		var id = context.Param("id")
+
+		if len(id) < 1 {
+			context.JSON(FailureMessageResponse(INVALID_ID))
+			return
+		}
+
+		todoId, todoIdErr := strconv.Atoi(id)
+
+		if todoIdErr != nil {
+			log.Println(todoIdErr)
+			context.JSON(FailureMessageResponse(INVALID_ID))
+			return
+		}
+
+		if err := controller.model.DeleteTodo(value.Id, todoId); err != nil {
+			log.Println(err)
+			context.JSON(FailureMessageResponse(err.Error()))
+			return
+		}
+
+		context.JSON(SuccessMessageResponse(TODO_DELETED_SUCCESSFULLY))
+	}
+}
