@@ -13,6 +13,10 @@ const (
 	DATABASE_CONNECTING_ERROR = ""
 )
 
+const (
+	NOTHING_CHANGED = "nothing changed"
+)
+
 // User defined error messages for the user model
 const (
 	CREATE_USER_ERROR = "could not create user, check your credentials and try again"

@@ -151,6 +151,48 @@ func (controller *TodoController) UpdateTodoTask() gin.HandlerFunc {
 
 		log.Println(value)
 
+		// Get todo id from params
+		var id = context.Param("id")
+
+		if len(id) < 1 {
+			context.JSON(FailureMessageResponse(INVALID_ID))
+			return
+		}
+
+		todoId, todoIdErr := strconv.Atoi(id)
+
+		if todoIdErr != nil {
+			log.Println(todoIdErr)
+			context.JSON(FailureMessageResponse(INVALID_ID))
+			return
+		}
+
+		// Get todo task from request body
+		var payload CreateTodoRequestBody
+
+		if err := context.BindJSON(&payload); err != nil {
+			log.Println(err)
+			context.JSON(FailureMessageResponse(err.Error()))
+			return
+		}
+
+		payload.Task = strings.Trim(payload.Task, " ")
+
+		if len(payload.Task) < 1 {
+			context.JSON(FailureMessageResponse(INVALID_TODO))
+			return
+		}
+
+		// Update todo
+		if err := controller.model.UpdateTodoTask(value.Id, todoId, payload.Task); err != nil {
+			log.Println(err)
+			context.JSON(FailureMessageResponse(err.Error()))
+			return
+		}
+
+		context.JSON(SuccessMessageResponse(TODO_UPDATED_SUCCESSFULLY))
+		return
+
 	}
 }
 

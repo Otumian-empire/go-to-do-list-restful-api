@@ -29,9 +29,11 @@ func (user *User) CreateUser(username, password string) error {
 		return fmt.Errorf(CREATE_USER_ERROR)
 	}
 
-	if _, err := result.LastInsertId(); err != nil {
+	if rowsAffected, err := result.LastInsertId(); err != nil {
 		log.Println(err.Error())
 		return fmt.Errorf(CREATE_USER_ERROR)
+	} else if rowsAffected < 1 {
+		return fmt.Errorf(NOTHING_CHANGED)
 	}
 
 	return nil
@@ -88,8 +90,7 @@ func (user *User) UpdateUserPassword(id config.IdType, password string) error {
 		log.Println(err.Error())
 		return fmt.Errorf(UPDATE_USER_ERROR)
 	} else if rowsAffected < 1 {
-		log.Println(NO_ROW_AFFECT_ERROR)
-		return fmt.Errorf(UPDATE_USER_ERROR)
+		return fmt.Errorf(NOTHING_CHANGED)
 	}
 
 	return nil
@@ -107,12 +108,10 @@ func (user *User) UpdateUserUsername(id config.IdType, username string) error {
 		log.Println(err.Error())
 		return fmt.Errorf(UPDATE_USER_ERROR)
 	} else if rowsAffected < 1 {
-		log.Println(NO_ROW_AFFECT_ERROR)
-		return fmt.Errorf(UPDATE_USER_ERROR)
+		return fmt.Errorf(NOTHING_CHANGED)
 	}
 
 	return nil
-
 }
 
 func (user *User) DeleteUser(id config.IdType) error {
@@ -127,8 +126,7 @@ func (user *User) DeleteUser(id config.IdType) error {
 		log.Println(err.Error())
 		return fmt.Errorf(DELETE_USER_ERROR)
 	} else if rowsAffected < 1 {
-		log.Println(NO_ROW_AFFECT_ERROR)
-		return fmt.Errorf(DELETE_USER_ERROR)
+		return fmt.Errorf(NOTHING_CHANGED)
 	}
 
 	return nil

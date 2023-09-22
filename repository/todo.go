@@ -26,7 +26,7 @@ func (todo *Todo) CreateTodo(userId config.IdType, task string) error {
 		return fmt.Errorf(CREATE_TODO_ERROR)
 	} else if rowsAffected < 1 {
 		log.Println(NO_ROW_AFFECT_ERROR)
-		return fmt.Errorf(CREATE_TODO_ERROR)
+		return fmt.Errorf(NOTHING_CHANGED)
 	}
 
 	if _, err := result.LastInsertId(); err != nil {
@@ -119,8 +119,7 @@ func (todo *Todo) UpdateTodoTask(userId, id config.IdType, task string) error {
 		log.Println(err.Error())
 		return fmt.Errorf(UPDATE_TODO_ERROR)
 	} else if rowsAffected < 1 {
-		log.Println(NO_ROW_AFFECT_ERROR)
-		return fmt.Errorf(UPDATE_TODO_ERROR)
+		return fmt.Errorf(NOTHING_CHANGED)
 	}
 
 	return nil
@@ -138,8 +137,7 @@ func (todo *Todo) UpdateTodoCompletedState(userId, id config.IdType, completed b
 		log.Println(err.Error())
 		return fmt.Errorf(UPDATE_TODO_ERROR)
 	} else if rowsAffected < 1 {
-		log.Println(NO_ROW_AFFECT_ERROR)
-		return fmt.Errorf(UPDATE_TODO_ERROR)
+		return fmt.Errorf(NOTHING_CHANGED)
 	}
 
 	return nil
@@ -157,8 +155,7 @@ func (todo *Todo) DeleteTodo(userId, id config.IdType) error {
 		log.Println(err.Error())
 		return fmt.Errorf(DELETE_TODO_ERROR)
 	} else if rowsAffected < 1 {
-		log.Println(NO_ROW_AFFECT_ERROR)
-		return fmt.Errorf(DELETE_TODO_ERROR)
+		return fmt.Errorf(NOTHING_CHANGED)
 	}
 
 	return nil
@@ -172,15 +169,12 @@ func (todo *Todo) DeleteTodos(userId config.IdType) error {
 		return fmt.Errorf(DELETE_TODO_ERROR)
 	}
 
-	if _, err := result.RowsAffected(); err != nil {
+	if rowsAffected, err := result.RowsAffected(); err != nil {
 		log.Println(err.Error())
 		return fmt.Errorf(DELETE_TODO_ERROR)
+	} else if rowsAffected < 1 {
+		return fmt.Errorf(NOTHING_CHANGED)
 	}
-
-	// else if rowsAffected < 1 {
-	// 	log.Println(NO_ROW_AFFECT_ERROR)
-	// 	return fmt.Errorf(DELETE_TODO_ERROR)
-	// }
 
 	return nil
 }
