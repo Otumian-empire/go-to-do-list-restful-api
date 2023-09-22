@@ -6,13 +6,13 @@ import (
 	"log"
 )
 
-// the root of the tables
+// The root of the tables
 type Repository struct {
 	*Todo
 	*User
 }
 
-// database connection
+// Database connection
 func NewRepository(driverName, dataSourceName string) (*Repository, error) {
 	db, err := sql.Open(driverName, dataSourceName)
 

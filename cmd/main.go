@@ -40,8 +40,8 @@ func main() {
 
 	log.Println(web.DATABASE_CONNECTED)
 
-	// this handler here is a not a handler as defined in the NewHandler
-	// it is the route on passed to the new handler that is returned
+	// This handler here is a not a handler as defined in the NewHandler
+	// It is the route on passed to the new handler that is returned
 	handler := web.NewHandler(*store, gin.Default())
 
 	log.Println(fmt.Sprintf("%v: %v", web.SERVER_RUNNING_ON_PORT, ENV_CONST.ServerPort))

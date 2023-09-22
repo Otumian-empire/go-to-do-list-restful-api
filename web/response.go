@@ -2,7 +2,7 @@ package web
 
 import "net/http"
 
-// generic data
+// Generic data for any key-value pair
 type T map[string]any
 
 type response struct {
@@ -33,7 +33,6 @@ func SuccessMessageResponse(message string) (int, T) {
 	return new(http.StatusOK, T{
 		"success": true,
 		"message": message,
-		"data":    nil,
 	}).send()
 }
 
@@ -41,7 +40,6 @@ func FailureMessageResponse(message string) (int, T) {
 	return new(http.StatusOK, T{
 		"success": false,
 		"message": message,
-		"data":    nil,
 	}).send()
 }
 
@@ -49,7 +47,6 @@ func ServerErrorResponse(message string) (int, T) {
 	return new(http.StatusInternalServerError, T{
 		"success": false,
 		"message": message,
-		"data":    nil,
 	}).send()
 }
 
@@ -57,6 +54,5 @@ func AuthenticationErrorResponse(message string) (int, T) {
 	return new(http.StatusUnauthorized, T{
 		"success": false,
 		"message": message,
-		"data":    nil,
 	}).send()
 }

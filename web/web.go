@@ -7,11 +7,11 @@ import (
 
 func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engine {
 
-	// call the controllers and pass the repository
+	// Call the controllers and pass the repository
 	userController := UserController{model: _repository}
 	todoController := TodoController{model: _repository}
 
-	// endpoints specific to create, read and delete of the url
+	// Endpoints specific to create, read and delete of the url
 	userRoutes := router.Group("/users")
 	{
 		userRoutes.POST("/", userController.SignUp())
@@ -26,7 +26,7 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 		// userRoutes.GET("/logout", userController.Logout())
 	}
 
-	// endpoints specific for todos
+	// Endpoints specific for todos
 	todoRoutes := router.Group("/todos")
 	{
 		todoRoutes.Use(ApiKeyAuth(_repository))
@@ -34,6 +34,7 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 		todoRoutes.POST("/", todoController.CreateTodo())
 		todoRoutes.GET("/", todoController.ReadTodos())
 		todoRoutes.GET("/:id", todoController.ReadTodo())
+		todoRoutes.PUT("/:id", todoController.UpdateTodoTask())
 	}
 
 	return router

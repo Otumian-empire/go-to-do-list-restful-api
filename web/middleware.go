@@ -43,4 +43,4 @@ func ApiKeyAuth(_repository repository.Repository) gin.HandlerFunc {
 	}
 }
 
-// TODO: use jwt in place of apiKey authentication
+// TODO: Use jwt in place of apiKey authentication

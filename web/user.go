@@ -15,7 +15,7 @@ type UserController struct {
 
 func (controller *UserController) SignUp() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		// get the data from the request body
+		// Get the data from the request body
 		var payload AuthRequestBody
 
 		if err := context.BindJSON(&payload); err != nil {
@@ -34,14 +34,14 @@ func (controller *UserController) SignUp() gin.HandlerFunc {
 
 		payload.Password = passwordHash
 
-		// create user
+		// Create user
 		if err := controller.model.User.CreateUser(payload.Username, payload.Password); err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(err.Error()))
 			return
 		}
 
-		// return success message on user creation
+		// Return success message on user creation
 		log.Println(SIGN_UP_SUCCESSFUL)
 		context.JSON(SuccessMessageResponse(SIGN_UP_SUCCESSFUL))
 	}
@@ -49,7 +49,7 @@ func (controller *UserController) SignUp() gin.HandlerFunc {
 
 func (controller *UserController) Login() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		// get the data from the request body
+		// Get the data from the request body
 		var payload AuthRequestBody
 
 		if err := context.BindJSON(&payload); err != nil {
@@ -58,7 +58,7 @@ func (controller *UserController) Login() gin.HandlerFunc {
 			return
 		}
 
-		// read row with the same username
+		// Read row with the same username
 		row, err := controller.model.ReadUserByUsername(payload.Username)
 
 		log.Println(row)
@@ -90,7 +90,7 @@ func (controller *UserController) Login() gin.HandlerFunc {
 		// 	return
 		// }
 
-		// return success message on user creation
+		// Return success message on user creation
 		log.Println(LOGIN_SUCCESSFUL)
 		context.JSON(SuccessResponse(LOGIN_SUCCESSFUL, T{
 			"user": T{
@@ -117,10 +117,10 @@ func (controller *UserController) UpdateUserUsername() gin.HandlerFunc {
 			return
 		}
 
-		// get the username from the request body
+		// Get the username from the request body
 		var payload UpdateUserUsernameRequestBody
 
-		// check if the user is valid
+		// Check if the user is valid
 		if err := context.BindJSON(&payload); err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(err.Error()))
@@ -135,23 +135,25 @@ func (controller *UserController) UpdateUserUsername() gin.HandlerFunc {
 			return
 		}
 
-		// query the database for a row that matches the new username
+		// Query the database for a row that matches the new username
 		if _, err := controller.model.ReadUserByUsername(payload.Username); err == nil {
 			// check that the user's username is the same as that of the auth user
 			// else user already exist
-			log.Println(err.Error())
+			// log.Println(err.Error()) // raise pointer error
+
+			// if the error is not <nil> the there is a row with the same username
 			context.JSON(FailureMessageResponse(USERNAME_TAKEN))
 			return
 		}
 
-		// update the username
+		// Update the username
 		if err := controller.model.UpdateUserUsername(value.Id, payload.Username); err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(COULD_NOT_UPDATE_USERNAME))
 			return
 		}
 
-		// return a success response
+		// Return a success response
 		context.JSON(SuccessMessageResponse(USERNAME_UPDATED_SUCCESSFULLY))
 	}
 }
@@ -167,10 +169,10 @@ func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
 			return
 		}
 
-		// get the password from the request body
+		// Get the password from the request body
 		var payload UpdateUserPasswordRequestBody
 
-		// check if the user is valid
+		// Check if the user is valid
 		if err := context.BindJSON(&payload); err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(err.Error()))
@@ -193,14 +195,14 @@ func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
 			return
 		}
 
-		// update the password
+		// Update the password
 		if err := controller.model.UpdateUserPassword(value.Id, passwordHash); err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(COULD_NOT_UPDATE_PASSWORD))
 			return
 		}
 
-		// return a success response
+		// Return a success response
 		context.JSON(SuccessMessageResponse(PASSWORD_UPDATED_SUCCESSFULLY))
 	}
 }

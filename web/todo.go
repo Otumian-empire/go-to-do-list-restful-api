@@ -140,7 +140,19 @@ func (controller *TodoController) ReadTodos() gin.HandlerFunc {
 	}
 }
 
-// func (controller *TodoController) UpdateTodoTask() gin.HandlerFunc
+func (controller *TodoController) UpdateTodoTask() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		value, isValue := context.MustGet("user").(model.User)
+
+		if !isValue {
+			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
+			return
+		}
+
+		log.Println(value)
+
+	}
+}
 
 // func (controller *TodoController) UpdateTodoCompleted() gin.HandlerFunc
 
