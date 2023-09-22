@@ -16,3 +16,7 @@ type UpdateUserPasswordRequestBody struct {
 type CreateTodoRequestBody struct {
 	Task string `json:"task"`
 }
+
+type UpdateTodoStateRequestBody struct {
+	Completed bool `json:"completed"`
+}

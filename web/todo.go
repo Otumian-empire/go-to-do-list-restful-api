@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -192,10 +193,63 @@ func (controller *TodoController) UpdateTodoTask() gin.HandlerFunc {
 
 		context.JSON(SuccessMessageResponse(TODO_UPDATED_SUCCESSFULLY))
 		return
-
 	}
 }
 
-// func (controller *TodoController) UpdateTodoCompleted() gin.HandlerFunc
+func (controller *TodoController) UpdateTodoCompleted() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		value, isValue := context.MustGet("user").(model.User)
+
+		if !isValue {
+			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
+			return
+		}
+
+		log.Println(value)
+
+		// Get todo id from params
+		var id = context.Param("id")
+
+		if len(id) < 1 {
+			context.JSON(FailureMessageResponse(INVALID_ID))
+			return
+		}
+
+		todoId, todoIdErr := strconv.Atoi(id)
+
+		if todoIdErr != nil {
+			log.Println(todoIdErr)
+			context.JSON(FailureMessageResponse(INVALID_ID))
+			return
+		}
+
+		// Get todo state from request body
+		var payload UpdateTodoStateRequestBody
+
+		if err := context.BindJSON(&payload); err != nil {
+			log.Println(err)
+			context.JSON(FailureMessageResponse(err.Error()))
+			return
+		}
+
+		if fmt.Sprintf("%T", payload.Completed) != "bool" {
+			context.JSON(FailureMessageResponse(INVALID_TODO_STATE))
+			return
+		}
+
+		// Update todo
+		err := controller.model.UpdateTodoCompletedState(
+			value.Id, todoId, payload.Completed)
+
+		if err != nil {
+			log.Println(err)
+			context.JSON(FailureMessageResponse(err.Error()))
+			return
+		}
+
+		context.JSON(SuccessMessageResponse(TODO_UPDATED_SUCCESSFULLY))
+		return
+	}
+}
 
 // func (controller *TodoController) DeleteTodo() gin.HandlerFunc

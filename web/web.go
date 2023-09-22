@@ -35,6 +35,7 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 		todoRoutes.GET("/", todoController.ReadTodos())
 		todoRoutes.GET("/:id", todoController.ReadTodo())
 		todoRoutes.PUT("/:id", todoController.UpdateTodoTask())
+		todoRoutes.PUT("/:id/state", todoController.UpdateTodoCompleted())
 	}
 
 	return router

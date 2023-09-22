@@ -10,10 +10,11 @@ const (
 	TODOS_READ_SUCCESSFULLY       = "todos read successfully"
 	TODO_UPDATED_SUCCESSFULLY     = "todo updated successfully"
 
-	INVALID_USERNAME = "invalid username"
-	INVALID_PASSWORD = "invalid password"
-	INVALID_TODO     = "invalid todo"
-	INVALID_ID       = "invalid id"
+	INVALID_USERNAME   = "invalid username"
+	INVALID_PASSWORD   = "invalid password"
+	INVALID_TODO       = "invalid todo"
+	INVALID_TODO_STATE = "invalid todo state, pass true or false"
+	INVALID_ID         = "invalid id"
 
 	USERNAME_TAKEN            = "username is taken, try another one"
 	COULD_NOT_UPDATE_USERNAME = "could not update username"
