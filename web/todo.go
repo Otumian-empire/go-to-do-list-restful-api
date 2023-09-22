@@ -3,8 +3,6 @@ package web
 import (
 	"fmt"
 	"log"
-	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/otumian-empire/go-to-do-list-restful-api/model"
@@ -17,11 +15,9 @@ type TodoController struct {
 
 func (controller *TodoController) CreateTodo() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		log.Println(value)
-
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
@@ -34,14 +30,14 @@ func (controller *TodoController) CreateTodo() gin.HandlerFunc {
 			return
 		}
 
-		payload.Task = strings.Trim(payload.Task, " ")
+		validatedString, isValid := ValidateString(payload.Task)
 
-		if len(payload.Task) < 1 {
+		if !isValid {
 			context.JSON(FailureMessageResponse(INVALID_TODO))
 			return
 		}
 
-		if err := controller.model.CreateTodo(value.Id, payload.Task); err != nil {
+		if err := controller.model.CreateTodo(user.Id, validatedString); err != nil {
 			log.Println(err)
 			context.JSON(FailureMessageResponse(err.Error()))
 			return
@@ -54,30 +50,22 @@ func (controller *TodoController) CreateTodo() gin.HandlerFunc {
 
 func (controller *TodoController) ReadTodo() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		log.Println(value)
-
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
-		var id = context.Param("id")
+		var todoId, idErr = ConvertStringIdToInt(context.Param("id"))
 
-		if len(id) < 1 {
+		if idErr != nil {
+			log.Println(idErr)
 			context.JSON(FailureMessageResponse(INVALID_ID))
 			return
 		}
 
-		intId, intIdErr := strconv.Atoi(id)
-
-		if intIdErr != nil {
-			context.JSON(FailureMessageResponse(INVALID_ID))
-			return
-		}
-
-		todo, todoErr := controller.model.ReadTodoById(value.Id, intId)
+		todo, todoErr := controller.model.ReadTodoById(user.Id, todoId)
 
 		if todoErr != nil {
 			log.Println(todoErr)
@@ -91,31 +79,25 @@ func (controller *TodoController) ReadTodo() gin.HandlerFunc {
 
 func (controller *TodoController) ReadTodos() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
-		pageNumber, pageNumberErr := strconv.Atoi(
-			context.DefaultQuery("pageNumber", "1"))
+		pageNumber := convertStringQueryToInt(
+			context.DefaultQuery("pageNumber", fmt.Sprintf("%v", DEFAULT_PAGE_NUMBER)),
+			DEFAULT_PAGE_NUMBER)
 
-		if pageNumberErr != nil {
-			pageNumber = DEFAULT_PAGE_NUMBER
-		}
-
-		pageSize, pageSizeErr := strconv.Atoi(
-			context.DefaultQuery("pageSize", "20"))
-
-		if pageSizeErr != nil {
-			pageSize = DEFAULT_PAGE_SIZE
-		}
+		pageSize := convertStringQueryToInt(
+			context.DefaultQuery("pageSize", fmt.Sprintf("%v", DEFAULT_PAGE_SIZE)),
+			DEFAULT_PAGE_SIZE)
 
 		var pagination = CleanPaginationParams(pageNumber, pageSize)
 
 		todos, todoErr := controller.model.PaginateTodo(
-			value.Id,
+			user.Id,
 			pagination.PageSize,
 			(pagination.PageNumber-1)*pagination.PageSize)
 
@@ -125,7 +107,7 @@ func (controller *TodoController) ReadTodos() gin.HandlerFunc {
 			return
 		}
 
-		count, countErr := controller.model.CountPaginationTodo(value.Id)
+		count, countErr := controller.model.CountPaginationTodo(user.Id)
 
 		if countErr != nil {
 			log.Println(countErr)
@@ -143,27 +125,18 @@ func (controller *TodoController) ReadTodos() gin.HandlerFunc {
 
 func (controller *TodoController) UpdateTodoTask() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
-		log.Println(value)
-
 		// Get todo id from params
-		var id = context.Param("id")
+		var todoId, idErr = ConvertStringIdToInt(context.Param("id"))
 
-		if len(id) < 1 {
-			context.JSON(FailureMessageResponse(INVALID_ID))
-			return
-		}
-
-		todoId, todoIdErr := strconv.Atoi(id)
-
-		if todoIdErr != nil {
-			log.Println(todoIdErr)
+		if idErr != nil {
+			log.Println(idErr)
 			context.JSON(FailureMessageResponse(INVALID_ID))
 			return
 		}
@@ -177,15 +150,15 @@ func (controller *TodoController) UpdateTodoTask() gin.HandlerFunc {
 			return
 		}
 
-		payload.Task = strings.Trim(payload.Task, " ")
+		validatedString, isValid := ValidateString(payload.Task)
 
-		if len(payload.Task) < 1 {
+		if !isValid {
 			context.JSON(FailureMessageResponse(INVALID_TODO))
 			return
 		}
 
 		// Update todo
-		if err := controller.model.UpdateTodoTask(value.Id, todoId, payload.Task); err != nil {
+		if err := controller.model.UpdateTodoTask(user.Id, todoId, validatedString); err != nil {
 			log.Println(err)
 			context.JSON(FailureMessageResponse(err.Error()))
 			return
@@ -198,27 +171,18 @@ func (controller *TodoController) UpdateTodoTask() gin.HandlerFunc {
 
 func (controller *TodoController) UpdateTodoCompleted() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
-		log.Println(value)
-
 		// Get todo id from params
-		var id = context.Param("id")
+		var todoId, idErr = ConvertStringIdToInt(context.Param("id"))
 
-		if len(id) < 1 {
-			context.JSON(FailureMessageResponse(INVALID_ID))
-			return
-		}
-
-		todoId, todoIdErr := strconv.Atoi(id)
-
-		if todoIdErr != nil {
-			log.Println(todoIdErr)
+		if idErr != nil {
+			log.Println(idErr)
 			context.JSON(FailureMessageResponse(INVALID_ID))
 			return
 		}
@@ -239,7 +203,7 @@ func (controller *TodoController) UpdateTodoCompleted() gin.HandlerFunc {
 
 		// Update todo
 		err := controller.model.UpdateTodoCompletedState(
-			value.Id, todoId, payload.Completed)
+			user.Id, todoId, payload.Completed)
 
 		if err != nil {
 			log.Println(err)
@@ -254,32 +218,23 @@ func (controller *TodoController) UpdateTodoCompleted() gin.HandlerFunc {
 
 func (controller *TodoController) DeleteTodo() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
-		log.Println(value)
-
 		// Get todo id from params
-		var id = context.Param("id")
+		var todoId, idErr = ConvertStringIdToInt(context.Param("id"))
 
-		if len(id) < 1 {
+		if idErr != nil {
+			log.Println(idErr)
 			context.JSON(FailureMessageResponse(INVALID_ID))
 			return
 		}
 
-		todoId, todoIdErr := strconv.Atoi(id)
-
-		if todoIdErr != nil {
-			log.Println(todoIdErr)
-			context.JSON(FailureMessageResponse(INVALID_ID))
-			return
-		}
-
-		if err := controller.model.DeleteTodo(value.Id, todoId); err != nil {
+		if err := controller.model.DeleteTodo(user.Id, todoId); err != nil {
 			log.Println(err)
 			context.JSON(FailureMessageResponse(err.Error()))
 			return

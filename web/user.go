@@ -2,7 +2,6 @@ package web
 
 import (
 	"log"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/otumian-empire/go-to-do-list-restful-api/model"
@@ -24,7 +23,19 @@ func (controller *UserController) SignUp() gin.HandlerFunc {
 			return
 		}
 
-		passwordHash, err := HashPassword(payload.Password)
+		validatedUsername, isValidUsername := ValidateString(payload.Username)
+		if !isValidUsername {
+			context.JSON(FailureMessageResponse(INVALID_USERNAME))
+			return
+		}
+
+		validatedPassword, isValidPassword := ValidateString(payload.Password)
+		if !isValidPassword {
+			context.JSON(FailureMessageResponse(INVALID_PASSWORD))
+			return
+		}
+
+		passwordHash, err := HashPassword(validatedPassword)
 
 		if err != nil {
 			log.Println(err)
@@ -32,17 +43,14 @@ func (controller *UserController) SignUp() gin.HandlerFunc {
 			return
 		}
 
-		payload.Password = passwordHash
-
 		// Create user
-		if err := controller.model.User.CreateUser(payload.Username, payload.Password); err != nil {
+		if err := controller.model.User.CreateUser(validatedUsername, passwordHash); err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(err.Error()))
 			return
 		}
 
 		// Return success message on user creation
-		log.Println(SIGN_UP_SUCCESSFUL)
 		context.JSON(SuccessMessageResponse(SIGN_UP_SUCCESSFUL))
 	}
 }
@@ -58,40 +66,34 @@ func (controller *UserController) Login() gin.HandlerFunc {
 			return
 		}
 
-		// Read row with the same username
-		row, err := controller.model.ReadUserByUsername(payload.Username)
+		validatedUsername, isValidUsername := ValidateString(payload.Username)
+		if !isValidUsername {
+			context.JSON(FailureMessageResponse(INVALID_USERNAME))
+			return
+		}
 
-		log.Println(row)
+		validatedPassword, isValidPassword := ValidateString(payload.Password)
+		if !isValidPassword {
+			context.JSON(FailureMessageResponse(INVALID_PASSWORD))
+			return
+		}
+
+		// Read row with the same username
+		row, err := controller.model.ReadUserByUsername(validatedUsername)
+
 		if err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(err.Error()))
 			return
 		}
 
-		if !CheckPasswordHash(payload.Password, row.Password) {
+		if !CheckPasswordHash(validatedPassword, row.Password) {
 			log.Println("Validation check failed")
 			context.JSON(FailureMessageResponse(INVALID_CREDENTIAL))
 			return
 		}
 
-		row.Password = ""
-
-		// generate authorization token
-		// token, tokenErr := /* GenerateJwt */ CreateToken(
-		// 	CustomPayload{
-		// 		Id:       row.Id,
-		// 		Username: row.Username,
-		// 	},
-		// )
-
-		// if tokenErr != nil {
-		// 	log.Println("Token generation error")
-		// 	context.JSON(FailureMessageResponse(tokenErr.Error()))
-		// 	return
-		// }
-
 		// Return success message on user creation
-		log.Println(LOGIN_SUCCESSFUL)
 		context.JSON(SuccessResponse(LOGIN_SUCCESSFUL, T{
 			"user": T{
 				"id":        row.Id,
@@ -101,18 +103,14 @@ func (controller *UserController) Login() gin.HandlerFunc {
 			},
 			// "token": token,
 		}))
-
-		return
 	}
 }
 
 func (controller *UserController) UpdateUserUsername() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		log.Println(value)
-
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
@@ -127,27 +125,23 @@ func (controller *UserController) UpdateUserUsername() gin.HandlerFunc {
 			return
 		}
 
-		payload.Username = strings.Trim(payload.Username, " ")
+		validatedUsername, isValidUsername := ValidateString(payload.Username)
 
-		if len(payload.Username) < 1 {
+		if !isValidUsername {
 			log.Println(INVALID_USERNAME)
 			context.JSON(FailureMessageResponse(INVALID_USERNAME))
 			return
 		}
 
 		// Query the database for a row that matches the new username
-		if _, err := controller.model.ReadUserByUsername(payload.Username); err == nil {
-			// check that the user's username is the same as that of the auth user
-			// else user already exist
-			// log.Println(err.Error()) // raise pointer error
-
-			// if the error is not <nil> the there is a row with the same username
+		// If the error is not <nil> the there is a row with the same username
+		if _, err := controller.model.ReadUserByUsername(validatedUsername); err == nil {
 			context.JSON(FailureMessageResponse(USERNAME_TAKEN))
 			return
 		}
 
 		// Update the username
-		if err := controller.model.UpdateUserUsername(value.Id, payload.Username); err != nil {
+		if err := controller.model.UpdateUserUsername(user.Id, validatedUsername); err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(COULD_NOT_UPDATE_USERNAME))
 			return
@@ -160,11 +154,9 @@ func (controller *UserController) UpdateUserUsername() gin.HandlerFunc {
 
 func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		log.Println(value)
-
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
@@ -179,15 +171,15 @@ func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
 			return
 		}
 
-		payload.Password = strings.Trim(payload.Password, " ")
+		validatedPassword, isValidPassword := ValidateString(payload.Password)
 
-		if len(payload.Password) < 1 {
+		if !isValidPassword {
 			log.Println(INVALID_PASSWORD)
 			context.JSON(FailureMessageResponse(INVALID_PASSWORD))
 			return
 		}
 
-		passwordHash, passwordHashingError := HashPassword(payload.Password)
+		passwordHash, passwordHashingError := HashPassword(validatedPassword)
 
 		if passwordHashingError != nil {
 			log.Println(passwordHashingError)
@@ -196,7 +188,7 @@ func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
 		}
 
 		// Update the password
-		if err := controller.model.UpdateUserPassword(value.Id, passwordHash); err != nil {
+		if err := controller.model.UpdateUserPassword(user.Id, passwordHash); err != nil {
 			log.Println(err.Error())
 			context.JSON(FailureMessageResponse(COULD_NOT_UPDATE_PASSWORD))
 			return
@@ -209,37 +201,33 @@ func (controller *UserController) UpdateUserPassword() gin.HandlerFunc {
 
 func (controller *UserController) ReadUser() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		log.Println(value)
-
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(USER_DETAIL_READ_SUCCESSFULLY))
 			return
 		}
 
-		context.JSON(SuccessResponse(USER_DETAIL_READ_SUCCESSFULLY, value))
+		context.JSON(SuccessResponse(USER_DETAIL_READ_SUCCESSFULLY, user))
 	}
 }
 
 func (controller *UserController) DeleteUser() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value, isValue := context.MustGet("user").(model.User)
+		user, isUser := context.MustGet("user").(model.User)
 
-		log.Println(value)
-
-		if !isValue {
+		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
-		if err := controller.model.DeleteTodos(value.Id); err != nil {
+		if err := controller.model.DeleteTodos(user.Id); err != nil {
 			log.Println(err)
 			context.JSON(FailureMessageResponse(COULD_NOT_DELETE_USER))
 			return
 		}
 
-		if err := controller.model.DeleteUser(value.Id); err != nil {
+		if err := controller.model.DeleteUser(user.Id); err != nil {
 			log.Println(err)
 			context.JSON(FailureMessageResponse(COULD_NOT_DELETE_USER))
 			return
