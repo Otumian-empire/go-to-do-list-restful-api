@@ -57,14 +57,14 @@ func (todo *Todo) ReadTodoById(userId, id config.IdType) (model.Todo, error) {
 	return _todo, nil
 }
 
-func (todo *Todo) PaginateTodo(userId config.IdType, offset, limit int) ([]model.Todo, error) {
+func (todo *Todo) PaginateTodo(userId config.IdType, limit, offset int) ([]model.Todo, error) {
 	var todos []model.Todo
 
-	rows, err := todo.Query(PAGINATE_TODO_QUERY, userId, offset, limit)
+	rows, err := todo.Query(PAGINATE_TODO_QUERY, userId, limit, offset)
 
 	if err != nil || rows.Err() != nil {
 		log.Println(err)
-		return nil, fmt.Errorf(PAGINATE_TODO_ERROR)
+		return []model.Todo{}, fmt.Errorf(PAGINATE_TODO_ERROR)
 	}
 
 	defer rows.Close()
@@ -81,13 +81,30 @@ func (todo *Todo) PaginateTodo(userId config.IdType, offset, limit int) ([]model
 
 		if err != nil {
 			log.Println(err)
-			return nil, fmt.Errorf(PAGINATE_TODO_ERROR)
+			return []model.Todo{}, fmt.Errorf(PAGINATE_TODO_ERROR)
 		}
 
 		todos = append(todos, _todo)
 	}
 
 	return todos, nil
+}
+
+func (todo *Todo) CountPaginationTodo(userId config.IdType) (int, error) {
+	row := todo.QueryRow(PAGINATION_TODO_COUNT_QUERY, userId)
+
+	type PaginationCount struct {
+		Count int `json:"count"`
+	}
+
+	var _paginationCount PaginationCount
+
+	if err := row.Scan(&_paginationCount.Count); err != nil {
+		log.Println(err)
+		return 0, fmt.Errorf(PAGINATE_TODO_ERROR)
+	}
+
+	return _paginationCount.Count, nil
 }
 
 func (todo *Todo) UpdateTodoTask(userId, id config.IdType, task string) error {

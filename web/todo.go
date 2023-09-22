@@ -88,7 +88,57 @@ func (controller *TodoController) ReadTodo() gin.HandlerFunc {
 	}
 }
 
-// func (controller *TodoController) ReadTodos() gin.HandlerFunc
+func (controller *TodoController) ReadTodos() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		value, isValue := context.MustGet("user").(model.User)
+
+		if !isValue {
+			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
+			return
+		}
+
+		pageNumber, pageNumberErr := strconv.Atoi(
+			context.DefaultQuery("pageNumber", "1"))
+
+		if pageNumberErr != nil {
+			pageNumber = DEFAULT_PAGE_NUMBER
+		}
+
+		pageSize, pageSizeErr := strconv.Atoi(
+			context.DefaultQuery("pageSize", "20"))
+
+		if pageSizeErr != nil {
+			pageSize = DEFAULT_PAGE_SIZE
+		}
+
+		var pagination = CleanPaginationParams(pageNumber, pageSize)
+
+		todos, todoErr := controller.model.PaginateTodo(
+			value.Id,
+			pagination.PageSize,
+			(pagination.PageNumber-1)*pagination.PageSize)
+
+		if todoErr != nil {
+			log.Println(todoErr)
+			context.JSON(FailureMessageResponse(todoErr.Error()))
+			return
+		}
+
+		count, countErr := controller.model.CountPaginationTodo(value.Id)
+
+		if countErr != nil {
+			log.Println(countErr)
+			count = 0
+		}
+
+		// log.Println(todos)
+		context.JSON(SuccessResponse(TODOS_READ_SUCCESSFULLY, T{
+			"rows": todos,
+			"pagination": GetPaginationParams(
+				count, pagination.PageNumber, pagination.PageSize),
+		}))
+	}
+}
 
 // func (controller *TodoController) UpdateTodoTask() gin.HandlerFunc
 

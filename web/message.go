@@ -7,6 +7,7 @@ const (
 	USER_DELETED_SUCCESSFULLY     = "user deleted successfully"
 	TODO_CREATED_SUCCESSFULLY     = "todo created successfully"
 	TODO_READ_SUCCESSFULLY        = "todo read successfully"
+	TODOS_READ_SUCCESSFULLY       = "todos read successfully"
 
 	INVALID_USERNAME = "invalid username"
 	INVALID_PASSWORD = "invalid password"
