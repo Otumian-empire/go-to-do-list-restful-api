@@ -17,6 +17,8 @@ func (controller *TodoController) CreateTodo() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		user, isUser := context.MustGet("user").(model.User)
 
+		log.Println("user", user)
+		log.Println("isUser", isUser)
 		if !isUser {
 			context.JSON(FailureMessageResponse(INVALID_AUTHENTICATION))
 			return

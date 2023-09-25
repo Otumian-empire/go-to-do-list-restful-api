@@ -17,7 +17,7 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 		userRoutes.POST("/", userController.SignUp())
 		userRoutes.POST("/auth", userController.Login())
 
-		userRoutes.Use(ApiKeyAuth(_repository))
+		userRoutes.Use(AuthorizeJWT(_repository))
 
 		userRoutes.PUT("/username", userController.UpdateUserUsername())
 		userRoutes.PUT("/password", userController.UpdateUserPassword())
@@ -29,7 +29,7 @@ func NewHandler(_repository repository.Repository, router *gin.Engine) *gin.Engi
 	// Endpoints specific for todos
 	todoRoutes := router.Group("/todos")
 	{
-		todoRoutes.Use(ApiKeyAuth(_repository))
+		todoRoutes.Use(AuthorizeJWT(_repository))
 
 		todoRoutes.POST("/", todoController.CreateTodo())
 		todoRoutes.GET("/", todoController.ReadTodos())

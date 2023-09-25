@@ -3,11 +3,10 @@ module github.com/otumian-empire/go-to-do-list-restful-api
 go 1.21.0
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
 )
-
-require github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 
 require github.com/chenzhuoyu/iasm v0.9.0 // indirect
 

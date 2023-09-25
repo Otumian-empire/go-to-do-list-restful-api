@@ -79,7 +79,7 @@ func (controller *UserController) Login() gin.HandlerFunc {
 		}
 
 		// Read row with the same username
-		row, err := controller.model.ReadUserByUsername(validatedUsername)
+		user, err := controller.model.ReadUserByUsername(validatedUsername)
 
 		if err != nil {
 			log.Println(err.Error())
@@ -87,21 +87,31 @@ func (controller *UserController) Login() gin.HandlerFunc {
 			return
 		}
 
-		if !CheckPasswordHash(validatedPassword, row.Password) {
+		if !CheckPasswordHash(validatedPassword, user.Password) {
 			log.Println("Validation check failed")
 			context.JSON(FailureMessageResponse(INVALID_CREDENTIAL))
 			return
 		}
 
+		token, tokenErr := JWTAuthService().TokenGenerate(user.Id)
+
+		if tokenErr != nil {
+			log.Println(tokenErr)
+			context.JSON(FailureMessageResponse(tokenErr.Error()))
+			return
+		}
+
+		log.Println("token:", token)
+
 		// Return success message on user creation
 		context.JSON(SuccessResponse(LOGIN_SUCCESSFUL, T{
 			"user": T{
-				"id":        row.Id,
-				"username":  row.Username,
-				"createdAt": row.CreatedAt,
-				"updatedAt": row.UpdatedAt,
+				"id":        user.Id,
+				"username":  user.Username,
+				"createdAt": user.CreatedAt,
+				"updatedAt": user.UpdatedAt,
 			},
-			// "token": token,
+			"token": token,
 		}))
 	}
 }
@@ -203,12 +213,20 @@ func (controller *UserController) ReadUser() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		user, isUser := context.MustGet("user").(model.User)
 
+		log.Println("user", user)
+		log.Println("isUser", isUser)
+
 		if !isUser {
-			context.JSON(FailureMessageResponse(USER_DETAIL_READ_SUCCESSFULLY))
+			context.JSON(AuthenticationErrorResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
-		context.JSON(SuccessResponse(USER_DETAIL_READ_SUCCESSFULLY, user))
+		context.JSON(SuccessResponse(USER_DETAIL_READ_SUCCESSFULLY, T{
+			"id":        user.Id,
+			"username":  user.Username,
+			"createdAt": user.CreatedAt,
+			"updatedAt": user.UpdatedAt,
+		}))
 	}
 }
 

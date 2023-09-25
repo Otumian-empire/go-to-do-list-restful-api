@@ -28,6 +28,7 @@ const (
 	LOGIN_SUCCESSFUL   = "login successfully"
 
 	INVALID_AUTHENTICATION = "invalid authentication"
+	EXPIRED_TOKEN          = "invalid authentication: token has expired"
 	INVALID_CREDENTIAL     = "incorrect username or password"
 )
 
@@ -36,4 +37,12 @@ const (
 	SERVER_RECOVER_FROM_ERROR        = "recover from an error"
 	SERVER_LOADING_CREDENTIALS_ERROR = "error loading .env file"
 	SERVER_RUNNING_ON_PORT           = "server running on port"
+)
+
+const (
+	INVALID_TOKEN_FORMAT     = "invalid authentication: improper token format"
+	INVALID_TOKEN_HEADER     = "invalid authentication: error decoding header"
+	INVALID_TOKEN_PAYLOAD    = "invalid authentication: error decoding payload"
+	INVALID_TOKEN_EXPIRATION = "invalid authentication: invalid expiration time in token"
+	INVALID_TOKEN_ISSUER     = "invalid authentication: invalid issuer in token"
 )
