@@ -43,6 +43,7 @@ const (
 	INVALID_TOKEN_FORMAT     = "invalid authentication: improper token format"
 	INVALID_TOKEN_HEADER     = "invalid authentication: error decoding header"
 	INVALID_TOKEN_PAYLOAD    = "invalid authentication: error decoding payload"
-	INVALID_TOKEN_EXPIRATION = "invalid authentication: invalid expiration time in token"
+	INVALID_TOKEN_EXPIRATION = "invalid authentication: token has expired or expiration time in token is invalid"
 	INVALID_TOKEN_ISSUER     = "invalid authentication: invalid issuer in token"
+	INVALID_TOKEN_SUBJECT_ID = "invalid authentication: subject id not found in payload"
 )

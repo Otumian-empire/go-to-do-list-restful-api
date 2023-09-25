@@ -15,6 +15,9 @@ type environ struct {
 	DatabaseHost       string
 	ServerPort         string
 	DatabaseDriverName string
+	JwtIssuer          string
+	JwtSecret          string
+	JwtTtl             string
 }
 
 func GetEnvirons() (environ, error) {
@@ -33,5 +36,8 @@ func GetEnvirons() (environ, error) {
 		DatabaseHost:       env["DATABASE_HOST"],
 		ServerPort:         env["SERVER_PORT"],
 		DatabaseDriverName: env["DATABASE_DRIVER_NAME"],
+		JwtIssuer:          env["JWT_ISSUER"],
+		JwtSecret:          env["JWT_SECRET"],
+		JwtTtl:             env["JWT_TTL"],
 	}, nil
 }

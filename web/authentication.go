@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -26,19 +27,17 @@ type jwtServices struct {
 	issuer     string
 }
 
-func getSecretKey() string {
-	return "someHge124237_"
-}
-
-func getIssuer() string {
-	return "someIssuer12324"
-}
-
 func (service *jwtServices) TokenGenerate(id config.IdType) (string, error) {
+	env, _ := config.GetEnvirons()
+
+	ttl, _ := strconv.Atoi(env.JwtTtl)
+
+	log.Println("ttl", ttl)
+
 	claims := &authCustomClaims{
 		id,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 2).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * time.Duration(ttl)).Unix(),
 			Issuer:    service.issuer,
 			IssuedAt:  time.Now().Unix(),
 		},
@@ -61,17 +60,58 @@ func (service *jwtServices) TokenValidate(encodedToken string) (*jwt.Token, erro
 }
 
 func JWTAuthService() JWTService {
+	env, _ := config.GetEnvirons()
 	return &jwtServices{
-		privateKey: getSecretKey(),
-		issuer:     getIssuer(),
+		privateKey: env.JwtSecret,
+		issuer:     env.JwtIssuer,
 	}
+}
+
+func IsExpiredToken(claims jwt.MapClaims) bool {
+	// Get the expiration time from the "exp" claim
+	expirationTime, ok := claims["exp"].(float64)
+	if !ok {
+		return true
+	}
+
+	// Convert the expiration time to a Unix timestamp in seconds
+	expirationUnix := int64(expirationTime)
+
+	// Get the current time
+	currentTime := time.Now().Unix()
+
+	log.Println(currentTime, currentTime > expirationUnix)
+
+	return currentTime > expirationUnix
+}
+
+func IsInvalidIssuer(claims jwt.MapClaims, issuer string) bool {
+	// check the issuer
+	issuer, ok := claims["iss"].(string)
+	if !ok {
+		log.Println(INVALID_TOKEN_ISSUER)
+		return true
+	}
+
+	return issuer != issuer
+}
+
+func GetIdFromClaim(claims jwt.MapClaims) (config.IdType, error) {
+	idClaim, ok := claims["id"].(float64)
+
+	if !ok {
+		return 0, fmt.Errorf(INVALID_TOKEN_SUBJECT_ID)
+	}
+
+	return config.IdType(idClaim), nil
 }
 
 func AuthorizeJWT(repo repository.Repository) gin.HandlerFunc {
 	return func(context *gin.Context) {
-		log.Println("AuthorizeJWT")
-		apiKey := context.GetHeader("apiKey")
+		env, _ := config.GetEnvirons()
+		log.Println("env", env)
 
+		apiKey := context.GetHeader("apiKey")
 		if err := ValidateApiKey(apiKey); err != nil {
 			log.Println(err)
 			context.Abort()
@@ -80,7 +120,6 @@ func AuthorizeJWT(repo repository.Repository) gin.HandlerFunc {
 		}
 
 		token, err := JWTAuthService().TokenValidate(apiKey)
-
 		if err != nil {
 			log.Println(err)
 			context.Abort()
@@ -89,67 +128,36 @@ func AuthorizeJWT(repo repository.Repository) gin.HandlerFunc {
 		}
 
 		if !token.Valid {
-			log.Println("Invalid token")
+			log.Println("token.Valid ")
 			context.Abort()
 			context.JSON(AuthenticationErrorResponse(INVALID_AUTHENTICATION))
 			return
 		}
 
 		claims := token.Claims.(jwt.MapClaims)
-		log.Println(claims)
 
 		// Check if the token has expired
-		// Get the expiration time from the "exp" claim
-		expirationTime, ok := claims["exp"].(float64)
-		if !ok {
+		if IsExpiredToken(claims) {
 			context.Abort()
 			context.JSON(AuthenticationErrorResponse(INVALID_TOKEN_EXPIRATION))
 			return
 		}
 
-		// Convert the expiration time to a Unix timestamp in seconds
-		expirationUnix := int64(expirationTime)
-
-		// Get the current time
-		currentTime := time.Now().Unix()
-
-		if currentTime > expirationUnix {
-			log.Println(EXPIRED_TOKEN)
-			context.Abort()
-			context.JSON(AuthenticationErrorResponse(EXPIRED_TOKEN))
-			return
-		}
-
-		// check the issuer
-		issuer, ok := claims["iss"].(string)
-		if !ok {
-			log.Println(INVALID_TOKEN_ISSUER)
-			context.Abort()
-			context.JSON(AuthenticationErrorResponse(INVALID_TOKEN_ISSUER))
-			return
-		}
-
-		if issuer != getIssuer() {
-			log.Println(INVALID_TOKEN_ISSUER)
+		// Check the issuer
+		if IsInvalidIssuer(claims, env.JwtIssuer) {
 			context.Abort()
 			context.JSON(AuthenticationErrorResponse(INVALID_TOKEN_ISSUER))
 			return
 		}
 
 		// Get the user of this token
-		idClaim, ok := claims["id"].(float64)
-
-		log.Println("idClaim", idClaim)
-		log.Println("ok", ok)
-
-		if !ok {
+		userId, idErr := GetIdFromClaim(claims)
+		if idErr != nil {
+			log.Println(idErr)
 			context.Abort()
 			context.JSON(AuthenticationErrorResponse(INVALID_AUTHENTICATION))
 			return
 		}
-
-		userId := config.IdType(idClaim)
-		log.Println("userId", userId)
 
 		user, err := repo.ReadUserById(userId)
 
